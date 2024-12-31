@@ -8,13 +8,16 @@ import java.net.Socket;
 
 @SpringBootApplication
 public class SmsReceivingApplication {
+
 	public static void main(String[] args) throws Exception {
+
 		try (Socket socket = new Socket("localhost", 8082)) {
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-			String message = "Test Message from Receiving Server bu Nadil Liyanage BOC";
+			String message = "Test Message from Receiving Server by Nadil Liyanage BOC";
 			writer.println(message);
 			//inserting to the log file
 			LogFile.info("Err |            |                 |" + message);
+
 		}
 	}
 }

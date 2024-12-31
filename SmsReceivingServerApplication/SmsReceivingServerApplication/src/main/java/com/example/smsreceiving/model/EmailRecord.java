@@ -3,7 +3,7 @@ package com.example.smsreceiving.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "sms_db")
+@Table(name = "message")
 public class EmailRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
