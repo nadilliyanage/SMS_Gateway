@@ -17,13 +17,17 @@ public class SmsReceivingService {
         this.repository = repository;
     }
 
-    // Process PENDING and ERROR records
+    // Fetch records from the database and process PENDING and ERROR records
     public void processRecords() throws Exception {
         List<EmailRecord> pendingRecords = repository.findByStatus("PENDING");
-        sendToGateway(pendingRecords);
+        if (!pendingRecords.isEmpty()) {
+            sendToGateway(pendingRecords);
+        }
 
         List<EmailRecord> errorRecords = repository.findByStatus("ERROR");
-        sendToGateway(errorRecords);
+        if (!errorRecords.isEmpty()) {
+            sendToGateway(errorRecords);
+        }
     }
 
     // Send records to the Gateway Server via socket
@@ -31,7 +35,7 @@ public class SmsReceivingService {
         try (Socket socket = new Socket("localhost", 8082)) {
             OutputStream os = socket.getOutputStream();
             for (EmailRecord record : records) {
-                String data = record.getId() + "," + record.getEmail() + "," + record.getMessage() + "\n";
+                String data = record.getId() + "," + record.getMobileNumber() + ","+ record.getEmail() + "," + record.getMessage() + "\n";
                 os.write(data.getBytes());
                 record.setStatus("PROCESSING");
                 repository.save(record);
@@ -42,7 +46,7 @@ public class SmsReceivingService {
 
     // Update record status based on Gateway response
     public void updateRecordStatus(Long id, String status) {
-        EmailRecord record = repository.findById(id).orElseThrow();
+        EmailRecord record = repository.findById(id).orElseThrow(() -> new RuntimeException("Record not found"));
         record.setStatus(status);
         repository.save(record);
     }
